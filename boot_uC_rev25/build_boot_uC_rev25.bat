@@ -1,5 +1,5 @@
-set STM8ASM_DIR=D:\stm\_toolchain\stm8_asm
-set STM8ASM_INCLUDE_DIR=D:\stm\_toolchain\stm8_asm\include
+set STM8ASM_DIR=..\stm8_asm
+set STM8ASM_INCLUDE_DIR=..\stm8_asm\include
 set PATH=%STM8ASM_DIR%;%STM8ASM_INCLUDE_DIR%
 @echo on
 
