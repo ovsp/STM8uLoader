@@ -1,0 +1,32 @@
+;                 5V        _ _ _ _ _ _ _ _ _ _ _ _  _ _ _ _ _ _ _ _ _ _ _ _
+;USB-UART 5V  ->>-'      __|                       \/                       |__ 
+;USB-UART VCC ->>-,     |__| PD4 (HS) TIM2_CH1            TIM2_CH2 (HS) PD3 |__|----------------,   /|
+;USB-UART 3V3 ->>-'      1 |    UART1_CK  BEEP            AIN4   ADC_ETR    |20                 |  / | 
+;USB-UART TXD ->>----,   __|                                                |__               ,---/  | 
+;USB-UART RXD ->>----|--|__| PD5 (HS) AIN5                AIN3     (HS) PD2 |__|              |   |  | 
+;USB-UART GND ->>-.  |   2 |    UART1_TX                  [TIM2_CH3]        |19               HCM1212A 
+;                GND |   __|                                                |__               |   |  | 
+;                    '--|__| PD6 (HS) AIN6                SWIM     (HS) PD1 |__|--- SWIM      |   |  | 
+;                        3 |    UART1_RX                                    |18               '---\  | 
+;                        __|                                                |__                 |  \ | 
+;               NRST ---|__| NRST                         SPI_MISO (HS) PC7 |__|----------------'   \| 
+;                        4 |                              [TIM1_CH2]        |17 
+;                        __|                                                |__ 
+;                       |__| PA1  OSCIN                   SPI_MOSI (HS) PC6 |__|           
+;                        5 |                              [TIM1_CH1]        |16               3V3        3V3
+;                        __|                                                |__                |          |
+;                       |__| PA2  OSCOUT                   SPI_SCK (HS) PC5 |__|               |          |
+;                        6 |                              [TIM2_CH1]        |15               ---        ---
+;                        __|                                                |__              |   |      |   |
+;                GND ---|__| Vss                     AIN2  CLK_CCO (HS) PC4 |__|             |   |      |   |
+;                        7 |                        [TIM1_CH2N]  TIM1_CH4   |14              |   |      |   |
+;                        __|                                                |__               ---        --- 
+;                       |__| Vcap                         TIM1_CH3 (HS) PC3 |__|               |  RED     | BLUE
+;                        8 |                              [TIM1_CH1N] [TLI] |13              -----LED   -----LED
+;                        __|                                                |__              \   / ->   \   / ->  
+;                3V3 ---|__| Vdd                  [ADC_ETR] I2C_SCL (T) PB4 |__|              \ /  ->    \ /  ->  
+;                        9 |                                                |12              -----      -----
+;                        __|    [SPI_NSS]                 [TIM1_BKN]        |__                |          |
+;                       |__| PA3 (HS) TIM_CH3             I2C_SDA   (T) PB5 |__|---------------'         GND
+;                        10|_ _ _ _ _ _ _ _ _ _ _ __ _ _ _ _ _ _ _ _ _ _ _ _|11 
+;                                             STM8S103F3P6   
