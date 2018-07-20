@@ -4,13 +4,15 @@ Compact UART bootloader for STM8 models without built-in bootloader.
 
 The bootloader code is located in the memory area OPTION Bytes (52 bytes + 1 reserve) and FLASH memory (18-20 bytes).
 
-Code for STM8 in folder
+Code for STM8 in folder:
 
     boot_uC_rev14
     
+or in folder:
+    
     boot_uC_rev25
     
-Code for PC in folder
+Code for PC in folder:
 
     boot_PC
     
