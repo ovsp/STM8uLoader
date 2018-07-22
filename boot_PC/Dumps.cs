@@ -971,6 +971,22 @@ public class Dumps
 	    
 	    
 	    
+	    public static void Dump_To_Console(Dictionary<int, byte> rxAB){
+	    	Dictionary<int, byte> AddressByte = new Dictionary<int, byte>(rxAB);
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int i = 0; int predAdr = 0;
+	    		foreach( KeyValuePair<int, byte> kvp in AddressByte){
+	    			if (i == 0) {	Console.Write(" ${0:X4} ", kvp.Key);
+	    							predAdr = kvp.Key;}
+	    			else { if( (kvp.Key % 16) == 0 | (kvp.Key - predAdr) > 1) Console.Write("\n ${0:X4} ", kvp.Key); }
+					Console.Write("${0:X2} ", kvp.Value);
+					i++;
+					predAdr = kvp.Key;
+				}// foreach
+			}else Console.WriteLine("\n" + Dumps.err_Msg);
+	    	Console.WriteLine("\n");
+	    }
+	    
 	    public static void Dump_To_Console(SortedDictionary<int, byte> rxAB){
 	    	SortedDictionary<int, byte> AddressByte = new SortedDictionary<int, byte>(rxAB);
 	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
@@ -986,8 +1002,68 @@ public class Dumps
 			}else Console.WriteLine("\n" + Dumps.err_Msg);
 	    	Console.WriteLine("\n");
 	    }
-	    
 	    	
+	    public static void Dump_To_Console_long(Dictionary<long, byte> rxAB){
+	    	Dictionary<long, byte> AddressByte = new Dictionary<long, byte>(rxAB);
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int i = 0; long predAdr = 0;
+	    		foreach( KeyValuePair<long, byte> kvp in AddressByte){
+	    			if (i == 0) {	Console.Write(" 0x{0:X8} ", kvp.Key);
+	    							predAdr = kvp.Key;}
+	    			else { if( (kvp.Key % 32) == 0 | (kvp.Key - predAdr) > 1) Console.Write("\n 0x{0:X8} ", kvp.Key); }
+					Console.Write("{0:X2} ", kvp.Value);
+					i++;
+					predAdr = kvp.Key;
+				}// foreach
+			}else Console.WriteLine("\n" + Dumps.err_Msg);
+	    	Console.WriteLine("\n");
+	    }	
+
+	    public static void Dump_To_Console_long(SortedDictionary<long, byte> rxAB){
+	    	SortedDictionary<long, byte> AddressByte = new SortedDictionary<long, byte>(rxAB);
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int i = 0; long predAdr = 0;
+	    		foreach( KeyValuePair<long, byte> kvp in AddressByte){
+	    			if (i == 0) {	Console.Write(" 0x{0:X8} ", kvp.Key);
+	    							predAdr = kvp.Key;}
+	    			else { if( (kvp.Key % 32) == 0 | (kvp.Key - predAdr) > 1) Console.Write("\n 0x{0:X8} ", kvp.Key); }
+					Console.Write("{0:X2} ", kvp.Value);
+					i++;
+					predAdr = kvp.Key;
+				}// foreach
+			}else Console.WriteLine("\n" + Dumps.err_Msg);
+	    	Console.WriteLine("\n");
+	    }
+	    
+ 
+	    
+	    public static string Dumps_To_Console(Dictionary<int, byte[]> rxAB){
+	    	Dictionary<int, byte[]> AddressByte = new Dictionary<int, byte[]>(rxAB);
+	    	string strng = "";
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int ji = 0;
+	    		foreach( KeyValuePair<int, byte[]> kvp in AddressByte){
+	    			//int adr = kvp.Key;
+	    			int j = 0;
+	    			for(int i = 0; i < kvp.Value.Length ;){
+	    				if(ji == 0) {Console.Write(" ${0:X4} ", kvp.Key);
+	    							strng = strng + String.Format("\n ${0:X4} ", kvp.Key); }
+	    				if(ji != 0 & j == 0) {Console.Write("\n ${0:X4} ", kvp.Key);
+	    							strng = strng + String.Format("\n ${0:X4} ", kvp.Key); }
+	    				else if(ji != 0 & (kvp.Key+i) % 16 == 0) {Console.Write("\n ${0:X4} ", kvp.Key+i);
+	    												strng = strng + String.Format("\n ${0:X4} ", kvp.Key+i); }
+						Console.Write("${0:X2} ", kvp.Value[i]);
+						strng = strng + String.Format("${0:X2} ", kvp.Value[i]);
+						i++; j++; ji++;
+						
+	    			}
+	    		}
+  		
+			} else Console.WriteLine("\n" + err_Msg);
+	    	Console.WriteLine("\n");
+	    	return strng;
+	    }
+	    
 	    public static string Dumps_To_Console(SortedDictionary<int, byte[]> rxAB){
 	    	SortedDictionary<int, byte[]> AddressByte = new SortedDictionary<int, byte[]>(rxAB);
 	    	string strng = "";
@@ -1014,6 +1090,63 @@ public class Dumps
 	    	Console.WriteLine("\n");
 	    	return strng;
 	    }
+	    
+	    
+
+	    public static string Dumps_To_Console_long(Dictionary<long, byte[]> rxAB){
+	    	Dictionary<long, byte[]> AddressByte = new Dictionary<long, byte[]>(rxAB);
+	    	string strng = "";
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int ji = 0;
+	    		foreach( KeyValuePair<long, byte[]> kvp in AddressByte){
+	    			//int adr = kvp.Key;
+	    			int j = 0;
+	    			for(int i = 0; i < kvp.Value.Length ;){
+	    				if(ji == 0) {Console.Write(" 0x{0:X8} ", kvp.Key);
+	    							strng = strng + String.Format("\n ${0:X8} ", kvp.Key); }
+	    				if(ji != 0 & j == 0) {Console.Write("\n 0x{0:X8} ", kvp.Key);
+	    							strng = strng + String.Format("\n 0x{0:X8} ", kvp.Key); }
+	    				else if(ji != 0 & (kvp.Key+i) % 32 == 0) {Console.Write("\n 0x{0:X8} ", kvp.Key+i);
+	    												strng = strng + String.Format("\n 0x{0:X8} ", kvp.Key+i); }
+						Console.Write("{0:X2} ", kvp.Value[i]);
+						strng = strng + String.Format("{0:X2} ", kvp.Value[i]);
+						i++; j++; ji++;
+						
+	    			}
+	    		}
+  		
+			} else Console.WriteLine("\n" + err_Msg);
+	    	Console.WriteLine("\n");
+	    	return strng;
+	    }
+	    
+	    public static string Dumps_To_Console_long(SortedDictionary<long, byte[]> rxAB){
+	    	SortedDictionary<long, byte[]> AddressByte = new SortedDictionary<long, byte[]>(rxAB);
+	    	string strng = "";
+	    	if(err_Msg == " OK"){	//Console.Write(" " + err_Msg);
+	    		int ji = 0;
+	    		foreach( KeyValuePair<long, byte[]> kvp in AddressByte){
+	    			//int adr = kvp.Key;
+	    			int j = 0;
+	    			for(int i = 0; i < kvp.Value.Length ;){
+	    				if(ji == 0) {Console.Write(" 0x{0:X8} ", kvp.Key);
+	    							strng = strng + String.Format("\n ${0:X8} ", kvp.Key); }
+	    				if(ji != 0 & j == 0) {Console.Write("\n 0x{0:X8} ", kvp.Key);
+	    							strng = strng + String.Format("\n 0x{0:X8} ", kvp.Key); }
+	    				else if(ji != 0 & (kvp.Key+i) % 32 == 0) {Console.Write("\n 0x{0:X8} ", kvp.Key+i);
+	    												strng = strng + String.Format("\n 0x{0:X8} ", kvp.Key+i); }
+						Console.Write("{0:X2} ", kvp.Value[i]);
+						strng = strng + String.Format("{0:X2} ", kvp.Value[i]);
+						i++; j++; ji++;
+						
+	    			}
+	    		}
+  		
+			} else Console.WriteLine("\n" + err_Msg);
+	    	Console.WriteLine("\n");
+	    	return strng;
+	    }
+	    
 	    
 	    
 
