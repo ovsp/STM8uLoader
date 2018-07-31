@@ -1,1 +1,666 @@
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 1  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
 
+   1                         stm8/     
+   2                         
+   3                         ; STM8S103F.asm
+   4                         
+   5                         ; Copyright (c) 2003-2016 STMicroelectronics
+   6                         
+   7                         ; STM8S103F
+   8                         
+   9  000000                                 BYTES                  ; following addresses are 8-bit 
+                                                                ;length
+  10                         
+  11                                   segment  byte at 0-7F 'periph'
+  12                         
+  13                         
+  14  000000                                 WORDS                  ; following addresses are 16-bit
+                                                                ; length
+  15                         
+  16                                   segment  byte at 5000 'periph2'
+  17                         
+  18                         
+  19                         ; Port A at 0x5000
+  20                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  21  005000                       .PA_ODR   DS.B     1             ; Port A data output latch 
+                                                                ;register
+  22  005001                       .PA_IDR   DS.B     1             ; Port A input pin value 
+                                                                ;register
+  23  005002                       .PA_DDR   DS.B     1             ; Port A data direction 
+                                                                ;register
+  24  005003                       .PA_CR1   DS.B     1             ; Port A control register 1
+  25  005004                       .PA_CR2   DS.B     1             ; Port A control register 2
+  26                         
+  27                         ; Port B at 0x5005
+  28                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  29  005005                       .PB_ODR   DS.B     1             ; Port B data output latch 
+                                                                ;register
+  30  005006                       .PB_IDR   DS.B     1             ; Port B input pin value 
+                                                                ;register
+  31  005007                       .PB_DDR   DS.B     1             ; Port B data direction 
+                                                                ;register
+  32  005008                       .PB_CR1   DS.B     1             ; Port B control register 1
+  33  005009                       .PB_CR2   DS.B     1             ; Port B control register 2
+  34                         
+  35                         ; Port C at 0x500a
+  36                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  37  00500A                       .PC_ODR   DS.B     1             ; Port C data output latch 
+                                                                ;register
+  38  00500B                       .PC_IDR   DS.B     1             ; Port C input pin value 
+                                                                ;register
+  39  00500C                       .PC_DDR   DS.B     1             ; Port C data direction 
+                                                                ;register
+  40  00500D                       .PC_CR1   DS.B     1             ; Port C control register 1
+  41  00500E                       .PC_CR2   DS.B     1             ; Port C control register 2
+  42                         
+  43                         ; Port D at 0x500f
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 2  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+  44                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  45  00500F                       .PD_ODR   DS.B     1             ; Port D data output latch 
+                                                                ;register
+  46  005010                       .PD_IDR   DS.B     1             ; Port D input pin value 
+                                                                ;register
+  47  005011                       .PD_DDR   DS.B     1             ; Port D data direction 
+                                                                ;register
+  48  005012                       .PD_CR1   DS.B     1             ; Port D control register 1
+  49  005013                       .PD_CR2   DS.B     1             ; Port D control register 2
+  50  005014                       reserved1  DS.B     70            ; unused
+  51                         
+  52                         ; Flash at 0x505a
+  53                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  54  00505A                       .FLASH_CR1  DS.B     1             ; Flash control register 1
+  55  00505B                       .FLASH_CR2  DS.B     1             ; Flash control register 2
+  56  00505C                       .FLASH_NCR2  DS.B     1             ; Flash complementary control 
+                                                                ;register 2
+  57  00505D                       .FLASH_FPR  DS.B     1             ; Flash protection register
+  58  00505E                       .FLASH_NFPR  DS.B     1             ; Flash complementary protection
+                                                                ; register
+  59  00505F                       .FLASH_IAPSR  DS.B     1             ; Flash in-application 
+                                                                ;programming status register
+  60  005060                       reserved2  DS.B     2             ; unused
+  61  005062                       .FLASH_PUKR  DS.B     1             ; Flash Program memory 
+                                                                ;unprotection register
+  62  005063                       reserved3  DS.B     1             ; unused
+  63  005064                       .FLASH_DUKR  DS.B     1             ; Data EEPROM unprotection 
+                                                                ;register
+  64  005065                       reserved4  DS.B     59            ; unused
+  65                         
+  66                         ; External Interrupt Control Register (ITC) at 0x50a0
+  67                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  68  0050A0                       .EXTI_CR1  DS.B     1             ; External interrupt control 
+                                                                ;register 1
+  69  0050A1                       .EXTI_CR2  DS.B     1             ; External interrupt control 
+                                                                ;register 2
+  70  0050A2                       reserved5  DS.B     17            ; unused
+  71                         
+  72                         ; Reset (RST) at 0x50b3
+  73                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  74  0050B3                       .RST_SR   DS.B     1             ; Reset status register 1
+  75  0050B4                       reserved6  DS.B     12            ; unused
+  76                         
+  77                         ; Clock Control (CLK) at 0x50c0
+  78                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  79  0050C0                       .CLK_ICKR  DS.B     1             ; Internal clock control 
+                                                                ;register
+  80  0050C1                       .CLK_ECKR  DS.B     1             ; External clock control 
+                                                                ;register
+  81  0050C2                       reserved7  DS.B     1             ; unused
+  82  0050C3                       .CLK_CMSR  DS.B     1             ; Clock master status register
+  83  0050C4                       .CLK_SWR  DS.B     1             ; Clock master switch register
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 3  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+  84  0050C5                       .CLK_SWCR  DS.B     1             ; Clock switch control register
+  85  0050C6                       .CLK_CKDIVR  DS.B     1             ; Clock divider register
+  86  0050C7                       .CLK_PCKENR1  DS.B     1             ; Peripheral clock gating 
+                                                                ;register 1
+  87  0050C8                       .CLK_CSSR  DS.B     1             ; Clock security system 
+                                                                ;register
+  88  0050C9                       .CLK_CCOR  DS.B     1             ; Configurable clock control 
+                                                                ;register
+  89  0050CA                       .CLK_PCKENR2  DS.B     1             ; Peripheral clock gating 
+                                                                ;register 2
+  90  0050CB                       .CLK_CANCCR  DS.B     1             ; CAN clock control register
+  91  0050CC                       .CLK_HSITRIMR  DS.B     1             ; HSI clock calibration trimming
+                                                                ; register
+  92  0050CD                       .CLK_SWIMCCR  DS.B     1             ; SWIM clock control register
+  93  0050CE                       reserved8  DS.B     3             ; unused
+  94                         
+  95                         ; Window Watchdog (WWDG) at 0x50d1
+  96                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+  97  0050D1                       .WWDG_CR  DS.B     1             ; WWDG Control Register
+  98  0050D2                       .WWDG_WR  DS.B     1             ; WWDR Window Register
+  99  0050D3                       reserved9  DS.B     13            ; unused
+ 100                         
+ 101                         ; Independent Watchdog (IWDG) at 0x50e0
+ 102                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 103  0050E0                       .IWDG_KR  DS.B     1             ; IWDG Key Register
+ 104  0050E1                       .IWDG_PR  DS.B     1             ; IWDG Prescaler Register
+ 105  0050E2                       .IWDG_RLR  DS.B     1             ; IWDG Reload Register
+ 106  0050E3                       reserved10  DS.B     13            ; unused
+ 107                         
+ 108                         ; Auto Wake-Up (AWU) at 0x50f0
+ 109                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 110  0050F0                       .AWU_CSR  DS.B     1             ; AWU Control/Status Register
+ 111  0050F1                       .AWU_APR  DS.B     1             ; AWU asynchronous prescaler 
+                                                                ;buffer register
+ 112  0050F2                       .AWU_TBR  DS.B     1             ; AWU Timebase selection 
+                                                                ;register
+ 113                         
+ 114                         ; Beeper (BEEP) at 0x50f3
+ 115                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 116  0050F3                       .BEEP_CSR  DS.B     1             ; BEEP Control/Status Register
+ 117  0050F4                       reserved11  DS.B     268           ; unused
+ 118                         
+ 119                         ; Serial Peripheral Interface (SPI) at 0x5200
+ 120                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 121  005200                       .SPI_CR1  DS.B     1             ; SPI Control Register 1
+ 122  005201                       .SPI_CR2  DS.B     1             ; SPI Control Register 2
+ 123  005202                       .SPI_ICR  DS.B     1             ; SPI Interrupt Control 
+                                                                ;Register
+ 124  005203                       .SPI_SR   DS.B     1             ; SPI Status Register
+ 125  005204                       .SPI_DR   DS.B     1             ; SPI Data Register
+ 126  005205                       .SPI_CRCPR  DS.B     1             ; SPI CRC Polynomial Register
+ 127  005206                       .SPI_RXCRCR  DS.B     1             ; SPI Rx CRC Register
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 4  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+ 128  005207                       .SPI_TXCRCR  DS.B     1             ; SPI Tx CRC Register
+ 129  005208                       reserved12  DS.B     8             ; unused
+ 130                         
+ 131                         ; I2C Bus Interface (I2C) at 0x5210
+ 132                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 133  005210                       .I2C_CR1  DS.B     1             ; I2C control register 1
+ 134  005211                       .I2C_CR2  DS.B     1             ; I2C control register 2
+ 135  005212                       .I2C_FREQR  DS.B     1             ; I2C frequency register
+ 136  005213                       .I2C_OARL  DS.B     1             ; I2C Own address register low
+ 137  005214                       .I2C_OARH  DS.B     1             ; I2C Own address register high
+ 138  005215                       reserved13  DS.B     1             ; unused
+ 139  005216                       .I2C_DR   DS.B     1             ; I2C data register
+ 140  005217                       .I2C_SR1  DS.B     1             ; I2C status register 1
+ 141  005218                       .I2C_SR2  DS.B     1             ; I2C status register 2
+ 142  005219                       .I2C_SR3  DS.B     1             ; I2C status register 3
+ 143  00521A                       .I2C_ITR  DS.B     1             ; I2C interrupt control 
+                                                                ;register
+ 144  00521B                       .I2C_CCRL  DS.B     1             ; I2C Clock control register 
+                                                                ;low
+ 145  00521C                       .I2C_CCRH  DS.B     1             ; I2C Clock control register 
+                                                                ;high
+ 146  00521D                       .I2C_TRISER  DS.B     1             ; I2C TRISE register
+ 147  00521E                       .I2C_PECR  DS.B     1             ; I2C packet error checking 
+                                                                ;register
+ 148  00521F                       reserved14  DS.B     17            ; unused
+ 149                         
+ 150                         ; Universal synch/asynch receiver transmitter (UART1) at 
+                               ;0x5230
+ 151                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 152  005230                       .UART1_SR  DS.B     1             ; UART1 Status Register
+ 153  005231                       .UART1_DR  DS.B     1             ; UART1 Data Register
+ 154  005232                       .UART1_BRR1  DS.B     1             ; UART1 Baud Rate Register 1
+ 155  005233                       .UART1_BRR2  DS.B     1             ; UART1 Baud Rate Register 2
+ 156  005234                       .UART1_CR1  DS.B     1             ; UART1 Control Register 1
+ 157  005235                       .UART1_CR2  DS.B     1             ; UART1 Control Register 2
+ 158  005236                       .UART1_CR3  DS.B     1             ; UART1 Control Register 3
+ 159  005237                       .UART1_CR4  DS.B     1             ; UART1 Control Register 4
+ 160  005238                       .UART1_CR5  DS.B     1             ; UART1 Control Register 5
+ 161  005239                       .UART1_GTR  DS.B     1             ; UART1 Guard time Register
+ 162  00523A                       .UART1_PSCR  DS.B     1             ; UART1 Prescaler Register
+ 163  00523B                       reserved15  DS.B     21            ; unused
+ 164                         
+ 165                         ; 16-Bit Timer 1 (TIM1) at 0x5250
+ 166                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 167  005250                       .TIM1_CR1  DS.B     1             ; TIM1 Control register 1
+ 168  005251                       .TIM1_CR2  DS.B     1             ; TIM1 Control register 2
+ 169  005252                       .TIM1_SMCR  DS.B     1             ; TIM1 Slave Mode Control 
+                                                                ;register
+ 170  005253                       .TIM1_ETR  DS.B     1             ; TIM1 external trigger 
+                                                                ;register
+ 171  005254                       .TIM1_IER  DS.B     1             ; TIM1 Interrupt enable 
+                                                                ;register
+ 172  005255                       .TIM1_SR1  DS.B     1             ; TIM1 Status register 1
+ 173  005256                       .TIM1_SR2  DS.B     1             ; TIM1 Status register 2
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 5  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+ 174  005257                       .TIM1_EGR  DS.B     1             ; TIM1 Event Generation 
+                                                                ;register
+ 175  005258                       .TIM1_CCMR1  DS.B     1             ; TIM1 Capture/Compare mode 
+                                                                ;register 1
+ 176  005259                       .TIM1_CCMR2  DS.B     1             ; TIM1 Capture/Compare mode 
+                                                                ;register 2
+ 177  00525A                       .TIM1_CCMR3  DS.B     1             ; TIM1 Capture/Compare mode 
+                                                                ;register 3
+ 178  00525B                       .TIM1_CCMR4  DS.B     1             ; TIM1 Capture/Compare mode 
+                                                                ;register 4
+ 179  00525C                       .TIM1_CCER1  DS.B     1             ; TIM1 Capture/Compare enable 
+                                                                ;register 1
+ 180  00525D                       .TIM1_CCER2  DS.B     1             ; TIM1 Capture/Compare enable 
+                                                                ;register 2
+ 181  00525E                       .TIM1_CNTRH  DS.B     1             ; Data bits High
+ 182  00525F                       .TIM1_CNTRL  DS.B     1             ; Data bits Low
+ 183  005260                       .TIM1_PSCRH  DS.B     1             ; Data bits High
+ 184  005261                       .TIM1_PSCRL  DS.B     1             ; Data bits Low
+ 185  005262                       .TIM1_ARRH  DS.B     1             ; Data bits High
+ 186  005263                       .TIM1_ARRL  DS.B     1             ; Data bits Low
+ 187  005264                       .TIM1_RCR  DS.B     1             ; TIM1 Repetition counter 
+                                                                ;register
+ 188  005265                       .TIM1_CCR1H  DS.B     1             ; Data bits High
+ 189  005266                       .TIM1_CCR1L  DS.B     1             ; Data bits Low
+ 190  005267                       .TIM1_CCR2H  DS.B     1             ; Data bits High
+ 191  005268                       .TIM1_CCR2L  DS.B     1             ; Data bits Low
+ 192  005269                       .TIM1_CCR3H  DS.B     1             ; Data bits High
+ 193  00526A                       .TIM1_CCR3L  DS.B     1             ; Data bits Low
+ 194  00526B                       .TIM1_CCR4H  DS.B     1             ; Data bits High
+ 195  00526C                       .TIM1_CCR4L  DS.B     1             ; Data bits Low
+ 196  00526D                       .TIM1_BKR  DS.B     1             ; TIM1 Break register
+ 197  00526E                       .TIM1_DTR  DS.B     1             ; TIM1 Dead-time register
+ 198  00526F                       .TIM1_OISR  DS.B     1             ; TIM1 Output idle state 
+                                                                ;register
+ 199  005270                       reserved16  DS.B     144           ; unused
+ 200                         
+ 201                         ; 16-Bit Timer 2 (TIM2) at 0x5300
+ 202                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 203  005300                       .TIM2_CR1  DS.B     1             ; TIM2 Control register 1
+ 204  005301                       reserved17  DS.B     2             ; unused
+ 205  005303                       .TIM2_IER  DS.B     1             ; TIM2 Interrupt enable 
+                                                                ;register
+ 206  005304                       .TIM2_SR1  DS.B     1             ; TIM2 Status register 1
+ 207  005305                       .TIM2_SR2  DS.B     1             ; TIM2 Status register 2
+ 208  005306                       .TIM2_EGR  DS.B     1             ; TIM2 Event Generation 
+                                                                ;register
+ 209  005307                       .TIM2_CCMR1  DS.B     1             ; TIM2 Capture/Compare mode 
+                                                                ;register 1
+ 210  005308                       .TIM2_CCMR2  DS.B     1             ; TIM2 Capture/Compare mode 
+                                                                ;register 2
+ 211  005309                       .TIM2_CCMR3  DS.B     1             ; TIM2 Capture/Compare mode 
+                                                                ;register 3
+ 212  00530A                       .TIM2_CCER1  DS.B     1             ; TIM2 Capture/Compare enable 
+                                                                ;register 1
+ 213  00530B                       .TIM2_CCER2  DS.B     1             ; TIM2 Capture/Compare enable 
+                                                                ;register 2
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 6  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+ 214  00530C                       .TIM2_CNTRH  DS.B     1             ; Data bits High
+ 215  00530D                       .TIM2_CNTRL  DS.B     1             ; Data bits Low
+ 216  00530E                       .TIM2_PSCR  DS.B     1             ; TIM2 Prescaler register
+ 217  00530F                       .TIM2_ARRH  DS.B     1             ; Data bits High
+ 218  005310                       .TIM2_ARRL  DS.B     1             ; Data bits Low
+ 219  005311                       .TIM2_CCR1H  DS.B     1             ; Data bits High
+ 220  005312                       .TIM2_CCR1L  DS.B     1             ; Data bits Low
+ 221  005313                       .TIM2_CCR2H  DS.B     1             ; Data bits High
+ 222  005314                       .TIM2_CCR2L  DS.B     1             ; Data bits Low
+ 223  005315                       .TIM2_CCR3H  DS.B     1             ; Data bits High
+ 224  005316                       .TIM2_CCR3L  DS.B     1             ; Data bits Low
+ 225  005317                       reserved18  DS.B     41            ; unused
+ 226                         
+ 227                         ; 8-Bit  Timer 4 (TIM4) at 0x5340
+ 228                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 229  005340                       .TIM4_CR1  DS.B     1             ; TIM4 Control register 1
+ 230  005341                       reserved19  DS.B     2             ; unused
+ 231  005343                       .TIM4_IER  DS.B     1             ; TIM4 Interrupt enable 
+                                                                ;register
+ 232  005344                       .TIM4_SR  DS.B     1             ; TIM4 Status register
+ 233  005345                       .TIM4_EGR  DS.B     1             ; TIM4 Event Generation 
+                                                                ;register
+ 234  005346                       .TIM4_CNTR  DS.B     1             ; TIM4 Counter
+ 235  005347                       .TIM4_PSCR  DS.B     1             ; TIM4 Prescaler register
+ 236  005348                       .TIM4_ARR  DS.B     1             ; TIM4 Auto-reload register
+ 237  005349                       reserved20  DS.B     151           ; unused
+ 238                         
+ 239                         ; 10-Bit A/D Converter (ADC1) at 0x53e0
+ 240                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 241  0053E0                       .ADC_DB0RH  DS.B     1             ; Data Buffer register 0 High
+ 242  0053E1                       .ADC_DB0RL  DS.B     1             ; Data Buffer register 0 Low
+ 243  0053E2                       .ADC_DB1RH  DS.B     1             ; Data Buffer register 1 High
+ 244  0053E3                       .ADC_DB1RL  DS.B     1             ; Data Buffer register 1 Low
+ 245  0053E4                       .ADC_DB2RH  DS.B     1             ; Data Buffer register 2 High
+ 246  0053E5                       .ADC_DB2RL  DS.B     1             ; Data Buffer register 2 Low
+ 247  0053E6                       .ADC_DB3RH  DS.B     1             ; Data Buffer register 3 High
+ 248  0053E7                       .ADC_DB3RL  DS.B     1             ; Data Buffer register 3 Low
+ 249  0053E8                       .ADC_DB4RH  DS.B     1             ; Data Buffer register 4 High
+ 250  0053E9                       .ADC_DB4RL  DS.B     1             ; Data Buffer register 4 Low
+ 251  0053EA                       .ADC_DB5RH  DS.B     1             ; Data Buffer register 5 High
+ 252  0053EB                       .ADC_DB5RL  DS.B     1             ; Data Buffer register 5 Low
+ 253  0053EC                       .ADC_DB6RH  DS.B     1             ; Data Buffer register 6 High
+ 254  0053ED                       .ADC_DB6RL  DS.B     1             ; Data Buffer register 6 Low
+ 255  0053EE                       .ADC_DB7RH  DS.B     1             ; Data Buffer register 7 High
+ 256  0053EF                       .ADC_DB7RL  DS.B     1             ; Data Buffer register 7 Low
+ 257  0053F0                       .ADC_DB8RH  DS.B     1             ; Data Buffer register 8 High
+ 258  0053F1                       .ADC_DB8RL  DS.B     1             ; Data Buffer register 8 Low
+ 259  0053F2                       .ADC_DB9RH  DS.B     1             ; Data Buffer register 9 High
+ 260  0053F3                       .ADC_DB9RL  DS.B     1             ; Data Buffer register 9 Low
+ 261  0053F4                       reserved21  DS.B     12            ; unused
+ 262  005400                       .ADC_CSR  DS.B     1             ; ADC Control/Status Register
+ 263  005401                       .ADC_CR1  DS.B     1             ; ADC Configuration Register 1
+ 264  005402                       .ADC_CR2  DS.B     1             ; ADC Configuration Register 2
+ 265  005403                       .ADC_CR3  DS.B     1             ; ADC Configuration Register 3
+ 266  005404                       .ADC_DRH  DS.B     1             ; Data bits High
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 7  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+ 267  005405                       .ADC_DRL  DS.B     1             ; Data bits Low
+ 268  005406                       .ADC_TDRH  DS.B     1             ; Schmitt trigger disable High
+ 269  005407                       .ADC_TDRL  DS.B     1             ; Schmitt trigger disable Low
+ 270  005408                       .ADC_HTRH  DS.B     1             ; High Threshold Register High
+ 271  005409                       .ADC_HTRL  DS.B     1             ; High Threshold Register Low
+ 272  00540A                       .ADC_LTRH  DS.B     1             ; Low Threshold Register High
+ 273  00540B                       .ADC_LTRL  DS.B     1             ; Low Threshold Register Low
+ 274  00540C                       .ADC_AWSRH  DS.B     1             ; Analog Watchdog Status 
+                                                                ;register High
+ 275  00540D                       .ADC_AWSRL  DS.B     1             ; Analog Watchdog Status 
+                                                                ;register Low
+ 276  00540E                       .ADC_AWCRH  DS.B     1             ; Analog Watchdog Control 
+                                                                ;register High
+ 277  00540F                       .ADC_AWCRL  DS.B     1             ; Analog Watchdog Control 
+                                                                ;register Low
+ 278  005410                       reserved22  DS.B     11088         ; unused
+ 279                         
+ 280                         ;  Global configuration register (CFG) at 0x7f60
+ 281                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 282  007F60                       .CFG_GCR  DS.B     1             ; CFG Global configuration 
+                                                                ;register
+ 283  007F61                       reserved23  DS.B     15            ; unused
+ 284                         
+ 285                         ; Interrupt Software Priority Register (ITC) at 0x7f70
+ 286                         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                               ;;;;;;
+ 287  007F70                       .ITC_SPR1  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 1
+ 288  007F71                       .ITC_SPR2  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 2
+ 289  007F72                       .ITC_SPR3  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 3
+ 290  007F73                       .ITC_SPR4  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 4
+ 291  007F74                       .ITC_SPR5  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 5
+ 292  007F75                       .ITC_SPR6  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 6
+ 293  007F76                       .ITC_SPR7  DS.B     1             ; Interrupt Software priority 
+                                                                ;register 7
+ 294                         
+ 295  007F77                                 end      
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 8  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+Symbol Name                       Value     Call       Type  Scope      Rel.  Line  Privacy  Segment   Size  Bytes File
+
+AWU_CSR                               50F0         no  WORD  Internal   ABS    110  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+AWU_APR                               50F1         no  WORD  Internal   ABS    111  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+AWU_TBR                               50F2         no  WORD  Internal   ABS    112  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB0RH                             53E0         no  WORD  Internal   ABS    241  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB0RL                             53E1         no  WORD  Internal   ABS    242  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB1RH                             53E2         no  WORD  Internal   ABS    243  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB1RL                             53E3         no  WORD  Internal   ABS    244  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB2RH                             53E4         no  WORD  Internal   ABS    245  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB2RL                             53E5         no  WORD  Internal   ABS    246  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB3RH                             53E6         no  WORD  Internal   ABS    247  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB3RL                             53E7         no  WORD  Internal   ABS    248  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB4RH                             53E8         no  WORD  Internal   ABS    249  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB4RL                             53E9         no  WORD  Internal   ABS    250  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB5RH                             53EA         no  WORD  Internal   ABS    251  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB5RL                             53EB         no  WORD  Internal   ABS    252  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB6RH                             53EC         no  WORD  Internal   ABS    253  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB6RL                             53ED         no  WORD  Internal   ABS    254  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB7RH                             53EE         no  WORD  Internal   ABS    255  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB7RL                             53EF         no  WORD  Internal   ABS    256  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB8RH                             53F0         no  WORD  Internal   ABS    257  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB8RL                             53F1         no  WORD  Internal   ABS    258  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB9RH                             53F2         no  WORD  Internal   ABS    259  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DB9RL                             53F3         no  WORD  Internal   ABS    260  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_CSR                               5400         no  WORD  Internal   ABS    262  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_CR1                               5401         no  WORD  Internal   ABS    263  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_CR2                               5402         no  WORD  Internal   ABS    264  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_CR3                               5403         no  WORD  Internal   ABS    265  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DRH                               5404         no  WORD  Internal   ABS    266  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_DRL                               5405         no  WORD  Internal   ABS    267  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_TDRH                              5406         no  WORD  Internal   ABS    268  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_TDRL                              5407         no  WORD  Internal   ABS    269  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_HTRH                              5408         no  WORD  Internal   ABS    270  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_HTRL                              5409         no  WORD  Internal   ABS    271  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_LTRH                              540A         no  WORD  Internal   ABS    272  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_LTRL                              540B         no  WORD  Internal   ABS    273  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_AWSRH                             540C         no  WORD  Internal   ABS    274  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_AWSRL                             540D         no  WORD  Internal   ABS    275  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_AWCRH                             540E         no  WORD  Internal   ABS    276  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ADC_AWCRL                             540F         no  WORD  Internal   ABS    277  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+BEEP_CSR                              50F3         no  WORD  Internal   ABS    116  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+CLK_ICKR                              50C0         no  WORD  Internal   ABS     79  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_ECKR                              50C1         no  WORD  Internal   ABS     80  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_CMSR                              50C3         no  WORD  Internal   ABS     82  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_SWR                               50C4         no  WORD  Internal   ABS     83  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_SWCR                              50C5         no  WORD  Internal   ABS     84  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_CKDIVR                            50C6         no  WORD  Internal   ABS     85  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_PCKENR1                           50C7         no  WORD  Internal   ABS     86  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_CSSR                              50C8         no  WORD  Internal   ABS     87  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_CCOR                              50C9         no  WORD  Internal   ABS     88  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_PCKENR2                           50CA         no  WORD  Internal   ABS     89  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_CANCCR                            50CB         no  WORD  Internal   ABS     90  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_HSITRIMR                          50CC         no  WORD  Internal   ABS     91  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+CLK_SWIMCCR                           50CD         no  WORD  Internal   ABS     92  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 9  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+CFG_GCR                               7F60         no  WORD  Internal   ABS    282  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+EXTI_CR1                              50A0         no  WORD  Internal   ABS     68  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+EXTI_CR2                              50A1         no  WORD  Internal   ABS     69  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+FLASH_CR1                             505A         no  WORD  Internal   ABS     54  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_CR2                             505B         no  WORD  Internal   ABS     55  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_NCR2                            505C         no  WORD  Internal   ABS     56  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_FPR                             505D         no  WORD  Internal   ABS     57  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_NFPR                            505E         no  WORD  Internal   ABS     58  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_IAPSR                           505F         no  WORD  Internal   ABS     59  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_PUKR                            5062         no  WORD  Internal   ABS     61  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+FLASH_DUKR                            5064         no  WORD  Internal   ABS     63  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+IWDG_KR                               50E0         no  WORD  Internal   ABS    103  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+IWDG_PR                               50E1         no  WORD  Internal   ABS    104  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+IWDG_RLR                              50E2         no  WORD  Internal   ABS    105  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_CR1                               5210         no  WORD  Internal   ABS    133  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_CR2                               5211         no  WORD  Internal   ABS    134  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_FREQR                             5212         no  WORD  Internal   ABS    135  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_OARL                              5213         no  WORD  Internal   ABS    136  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_OARH                              5214         no  WORD  Internal   ABS    137  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_DR                                5216         no  WORD  Internal   ABS    139  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_SR1                               5217         no  WORD  Internal   ABS    140  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_SR2                               5218         no  WORD  Internal   ABS    141  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_SR3                               5219         no  WORD  Internal   ABS    142  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_ITR                               521A         no  WORD  Internal   ABS    143  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_CCRL                              521B         no  WORD  Internal   ABS    144  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_CCRH                              521C         no  WORD  Internal   ABS    145  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_TRISER                            521D         no  WORD  Internal   ABS    146  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+I2C_PECR                              521E         no  WORD  Internal   ABS    147  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR1                              7F70         no  WORD  Internal   ABS    287  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR2                              7F71         no  WORD  Internal   ABS    288  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR3                              7F72         no  WORD  Internal   ABS    289  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR4                              7F73         no  WORD  Internal   ABS    290  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR5                              7F74         no  WORD  Internal   ABS    291  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR6                              7F75         no  WORD  Internal   ABS    292  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+ITC_SPR7                              7F76         no  WORD  Internal   ABS    293  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+PA_ODR                                5000         no  WORD  Internal   ABS     21  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PA_IDR                                5001         no  WORD  Internal   ABS     22  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PA_DDR                                5002         no  WORD  Internal   ABS     23  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PA_CR1                                5003         no  WORD  Internal   ABS     24  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PA_CR2                                5004         no  WORD  Internal   ABS     25  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PB_ODR                                5005         no  WORD  Internal   ABS     29  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PB_IDR                                5006         no  WORD  Internal   ABS     30  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PB_DDR                                5007         no  WORD  Internal   ABS     31  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PB_CR1                                5008         no  WORD  Internal   ABS     32  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PB_CR2                                5009         no  WORD  Internal   ABS     33  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PC_ODR                                500A         no  WORD  Internal   ABS     37  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PC_IDR                                500B         no  WORD  Internal   ABS     38  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PC_DDR                                500C         no  WORD  Internal   ABS     39  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PC_CR1                                500D         no  WORD  Internal   ABS     40  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PC_CR2                                500E         no  WORD  Internal   ABS     41  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PD_ODR                                500F         no  WORD  Internal   ABS     45  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PD_IDR                                5010         no  WORD  Internal   ABS     46  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PD_DDR                                5011         no  WORD  Internal   ABS     47  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 10  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+PD_CR1                                5012         no  WORD  Internal   ABS     48  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+PD_CR2                                5013         no  WORD  Internal   ABS     49  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+RST_SR                                50B3         no  WORD  Internal   ABS     74  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+SPI_CR1                               5200         no  WORD  Internal   ABS    121  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_CR2                               5201         no  WORD  Internal   ABS    122  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_ICR                               5202         no  WORD  Internal   ABS    123  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_SR                                5203         no  WORD  Internal   ABS    124  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_DR                                5204         no  WORD  Internal   ABS    125  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_CRCPR                             5205         no  WORD  Internal   ABS    126  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_RXCRCR                            5206         no  WORD  Internal   ABS    127  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+SPI_TXCRCR                            5207         no  WORD  Internal   ABS    128  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+TIM1_CR1                              5250         no  WORD  Internal   ABS    167  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CR2                              5251         no  WORD  Internal   ABS    168  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_SMCR                             5252         no  WORD  Internal   ABS    169  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_ETR                              5253         no  WORD  Internal   ABS    170  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_IER                              5254         no  WORD  Internal   ABS    171  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_SR1                              5255         no  WORD  Internal   ABS    172  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_SR2                              5256         no  WORD  Internal   ABS    173  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_EGR                              5257         no  WORD  Internal   ABS    174  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCMR1                            5258         no  WORD  Internal   ABS    175  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCMR2                            5259         no  WORD  Internal   ABS    176  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCMR3                            525A         no  WORD  Internal   ABS    177  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCMR4                            525B         no  WORD  Internal   ABS    178  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCER1                            525C         no  WORD  Internal   ABS    179  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCER2                            525D         no  WORD  Internal   ABS    180  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CNTRH                            525E         no  WORD  Internal   ABS    181  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CNTRL                            525F         no  WORD  Internal   ABS    182  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_PSCRH                            5260         no  WORD  Internal   ABS    183  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_PSCRL                            5261         no  WORD  Internal   ABS    184  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_ARRH                             5262         no  WORD  Internal   ABS    185  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_ARRL                             5263         no  WORD  Internal   ABS    186  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_RCR                              5264         no  WORD  Internal   ABS    187  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR1H                            5265         no  WORD  Internal   ABS    188  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR1L                            5266         no  WORD  Internal   ABS    189  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR2H                            5267         no  WORD  Internal   ABS    190  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR2L                            5268         no  WORD  Internal   ABS    191  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR3H                            5269         no  WORD  Internal   ABS    192  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR3L                            526A         no  WORD  Internal   ABS    193  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR4H                            526B         no  WORD  Internal   ABS    194  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_CCR4L                            526C         no  WORD  Internal   ABS    195  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_BKR                              526D         no  WORD  Internal   ABS    196  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_DTR                              526E         no  WORD  Internal   ABS    197  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM1_OISR                             526F         no  WORD  Internal   ABS    198  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CR1                              5300         no  WORD  Internal   ABS    203  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_IER                              5303         no  WORD  Internal   ABS    205  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_SR1                              5304         no  WORD  Internal   ABS    206  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_SR2                              5305         no  WORD  Internal   ABS    207  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_EGR                              5306         no  WORD  Internal   ABS    208  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCMR1                            5307         no  WORD  Internal   ABS    209  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCMR2                            5308         no  WORD  Internal   ABS    210  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCMR3                            5309         no  WORD  Internal   ABS    211  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCER1                            530A         no  WORD  Internal   ABS    212  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCER2                            530B         no  WORD  Internal   ABS    213  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CNTRH                            530C         no  WORD  Internal   ABS    214  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 11  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+TIM2_CNTRL                            530D         no  WORD  Internal   ABS    215  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_PSCR                             530E         no  WORD  Internal   ABS    216  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_ARRH                             530F         no  WORD  Internal   ABS    217  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_ARRL                             5310         no  WORD  Internal   ABS    218  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR1H                            5311         no  WORD  Internal   ABS    219  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR1L                            5312         no  WORD  Internal   ABS    220  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR2H                            5313         no  WORD  Internal   ABS    221  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR2L                            5314         no  WORD  Internal   ABS    222  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR3H                            5315         no  WORD  Internal   ABS    223  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM2_CCR3L                            5316         no  WORD  Internal   ABS    224  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_CR1                              5340         no  WORD  Internal   ABS    229  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_IER                              5343         no  WORD  Internal   ABS    231  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_SR                               5344         no  WORD  Internal   ABS    232  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_EGR                              5345         no  WORD  Internal   ABS    233  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_CNTR                             5346         no  WORD  Internal   ABS    234  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_PSCR                             5347         no  WORD  Internal   ABS    235  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+TIM4_ARR                              5348         no  WORD  Internal   ABS    236  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+UART1_SR                              5230         no  WORD  Internal   ABS    152  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_DR                              5231         no  WORD  Internal   ABS    153  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_BRR1                            5232         no  WORD  Internal   ABS    154  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_BRR2                            5233         no  WORD  Internal   ABS    155  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_CR1                             5234         no  WORD  Internal   ABS    156  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_CR2                             5235         no  WORD  Internal   ABS    157  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_CR3                             5236         no  WORD  Internal   ABS    158  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_CR4                             5237         no  WORD  Internal   ABS    159  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_CR5                             5238         no  WORD  Internal   ABS    160  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_GTR                             5239         no  WORD  Internal   ABS    161  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+UART1_PSCR                            523A         no  WORD  Internal   ABS    162  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+WWDG_CR                               50D1         no  WORD  Internal   ABS     97  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+WWDG_WR                               50D2         no  WORD  Internal   ABS     98  public   bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+reserved1                             5014         no  WORD  Internal   ABS     50  private  bss         70     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved2                             5060         no  WORD  Internal   ABS     60  private  bss          2     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved3                             5063         no  WORD  Internal   ABS     62  private  bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved4                             5065         no  WORD  Internal   ABS     64  private  bss         59     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved5                             50A2         no  WORD  Internal   ABS     70  private  bss         17     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved6                             50B4         no  WORD  Internal   ABS     75  private  bss         12     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved7                             50C2         no  WORD  Internal   ABS     81  private  bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved8                             50CE         no  WORD  Internal   ABS     93  private  bss          3     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved9                             50D3         no  WORD  Internal   ABS     99  private  bss         13     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved10                            50E3         no  WORD  Internal   ABS    106  private  bss         13     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved11                            50F4         no  WORD  Internal   ABS    117  private  bss        268     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved12                            5208         no  WORD  Internal   ABS    129  private  bss          8     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved13                            5215         no  WORD  Internal   ABS    138  private  bss          1     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved14                            521F         no  WORD  Internal   ABS    148  private  bss         17     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved15                            523B         no  WORD  Internal   ABS    163  private  bss         21     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved16                            5270         no  WORD  Internal   ABS    199  private  bss        144     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved17                            5301         no  WORD  Internal   ABS    204  private  bss          2     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved18                            5317         no  WORD  Internal   ABS    225  private  bss         41     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved19                            5341         no  WORD  Internal   ABS    230  private  bss          2     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved20                            5349         no  WORD  Internal   ABS    237  private  bss        151     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved21                            53F4         no  WORD  Internal   ABS    261  private  bss         12     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved22                            5410         no  WORD  Internal   ABS    278  private  bss      11088     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+reserved23                            7F61         no  WORD  Internal   ABS    283  private  bss         15     1  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+STMicroelectronics assembler v4.52   (C)1987-2018   Tue Jul 31 06:49:24 2018
+Page 12  Assembler
+                                               d:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm
+
+stm8                                  0000         no  WORD  Internal   rel      1  private  bss          0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.asm
+
+
+214 labels
+No errors on assembly of 'd:\stm\_toolchain\stm8_asm\include\stm8s103f3p.asm'

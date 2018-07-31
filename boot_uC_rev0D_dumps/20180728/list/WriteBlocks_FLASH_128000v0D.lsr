@@ -1,0 +1,463 @@
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 1  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+   1                         stm8/     TITLE    "WriteBlocks_FLASH_128000v0D88.asm"
+   2  000000                                 MOTOROLA 
+   3  000000                                 WORDS    
+   7  000000                       ; размер дампа должен быть 243 
+                               ;байта
+   8                         ; при этом дамп будет находится в 
+                               ;адресах $02ED...$03DF
+   9                         ; (затирает адеса $03DE:$03DF с адресом 
+                               ;перехода к начальному 
+                               ;загрузчику)
+  10                         ; и вызываться по адресу $02EF
+  11                         ; вызвавший дамп начальный 
+                               ;загрузчик находится в адресах 
+                               ;$03E0...$03FE
+  12                         ; и повторно может быть вызван по 
+                               ;адресу $03E0 (переключит скорость 
+                               ;на 9600, надо A<=$0D SP<=$03E1 X<=$0000)
+  13                         ; или по адресу $03E98 (скорость не 
+                               ;переключит, надо A<=$0D SP<=$03E9 X<=$0000)
+  14                         ; команда перехода к прикладной 
+                               ;программе здесь $03FB
+  15                                   segment  byte at 0000-00F2 'ram0'
+  16  000000   02EF                          dc.w     $02EF
+  17                         start:    
+  18                         ; Включаем pull-up на портах (если 
+                               ;подтяжка не предусмотрена 
+                               ;внешней схемой) или не включаем, 
+                               ;все равно работает, экономим 14 
+                               ;байт
+  19                         ;  ld    A, #%01001100              ; [A6 4C]
+  20                         ;  cpl    A                         ; [43]
+  21                         ;  ld    PA_CR1, A                  ; [C7 50 03]
+  22                         ;  ld    PB_CR1, A                  ; [C7 50 08]
+  23                         ;  ld    PC_CR1, A                  ; [C7 50 0D]
+  24                         ;  ld    PD_CR1, A                  ; [C7 50 12] 
+                               ;подтяжка на PD6(UART1_RX), PD2, PD1
+  25                         ; настраиваем UART1 на 
+                               ;прием/передачу на скорости 9600, 
+                               ;остальные настройки по умолчанию
+                               ; (8 бит, нет бита четности, 1 
+                               ;стоповый бит)
+  26  000002 X 35000000                      mov      UART1_BRR2, #0              ; [35 00 52 33]  для 
+                                                                ;Fmaster=16/8=2МГц и 128000
+  27  000006 X 35010000                      mov      UART1_BRR1, #1             ; [35 0D 52 32]  для 
+                                                                ;Fmaster=16/8=2МГц и 128000
+  28  00000A X 350C0000                      mov      UART1_CR2, #%00001100       ; [35 0C 52 35]    UART1_CR2.TEN
+                                                                ; <- 1  UART1_CR2.REN <- 1  
+                                                                ;разрешаем 
+                                                                ;передачу/прием
+  29                                   
+  30                         main_cycle:  
+  31                                   
+  32                         wait_byte_adrH_cmnd:  
+  33  00000E X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrH_cmnd
+  34  000013 X C60000                        ld       A, UART1_DR
+  35  000016   A1F0                          cp       A, #$F0
+  36  000018   245F                          JRUGE    wait_byte_cmd_test                ; Relative jump if Unsigned 
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 2  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+                                                                ;Greater or Equal
+  37  00001A   95                            ld       XH, A         ; старший байт 
+                                                                ;адреса в XH
+  38  00001B X C70000                        ld       UART1_DR, A          ; эхо старшего 
+                                                                ;байта адреса
+  39                         tx_echo_adrH:  
+  40  00001E X 720F0000FB                    btjf     UART1_SR, #7, tx_echo_adrH  ; skip if UART1_SR.TXE = 0		TXE:
+                                                                ; Transmit data register empty
+  41                                   
+  42                         wait_byte_adrL:  
+  43  000023 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrL
+  44                                   
+  45  000028 X C60000                        ld       A, UART1_DR
+  46  00002B   97                            ld       XL, A         ; младший байт 
+                                                                ;адреса в XL
+  47                                   
+  48                         wait_byte_cntr:  
+  49  00002C X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_cntr  ; количество 
+                                                                ;блоков
+  50  000031 X 55000003FF                    mov      $03FF, UART1_DR
+  51                         
+  52                                   
+  53                         write_block_cycle:  
+  54  000036   90AE0040                      ldw      Y, #64        ; размер блока
+  55                                   
+  56                         ; unlock FLASH memory  (writing the correct MASS keys)
+  57  00003A X 35560000                      mov      FLASH_PUKR, #$56             ; Write $56 then $AE in 
+                                                                ;FLASH_PUKR($5062)
+  58  00003E X 35AE0000                      mov      FLASH_PUKR, #$AE             ; If wrong keys have been 
+                                                                ;entered, another key 
+                                                                ;programming sequence can be 
+                                                                ;issued without resetting the 
+                                                                ;device.
+  59                         ; FLASH Block programming mode    после записи 
+                               ;блока последовательность надо 
+                               ;повторить
+  60  000042 X 35010000                      mov      FLASH_CR2,  #$01     
+  61  000046 X 35FE0000                      mov      FLASH_NCR2, #$FE       ; 
+  62                         ; FLASH Word programming mode    после записи 
+                               ;слова последовательность надо 
+                               ;повторить
+  63                         ;    mov     FLASH_CR2,  #$40     
+  64                         ;    mov     FLASH_NCR2, #$BF
+  65                         ; else FLASH byte programming
+  66                                   
+  67                         ; включаем светодиод	
+  68  00004A X 721A0000                      bset     PB_DDR,#5     ;
+  69  00004E X 721A0000                      bset     PB_CR1,#5     ; 
+  70                         ; при записи блоками нет 
+                               ;необходимости создавать буфер
+  71                         ; так как запись начинается только
+                               ; после копирования целого буфера
+  72                         wait_rx_byte:  
+  73  000052 X 720B0000FB                    btjf     UART1_SR, #5, wait_rx_byte
+  74  000057 X C60000                        ld       A, UART1_DR
+  75  00005A   F7                            ld       (X), A
+  76  00005B   5C                            incw     X
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 3  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+  77  00005C   905A                          decw     Y
+  78  00005E   26F2                          jrne     wait_rx_byte
+  79                         
+  80  000060 X 35FA0000                      mov      UART1_DR, #$FA  ; OK
+  81                         wait_tx_OK_FA:  
+  82  000064 X 720F0000FB                    btjf     UART1_SR, #7, wait_tx_OK_FA  ; skip if UART1_SR.TXE = 0		TXE:
+                                                                ; Transmit data register empty
+  83                         ; выключаем светодиод	
+  84  000069 X 721B0000                      bres     PB_DDR,#5     ;
+  85  00006D X 721B0000                      bres     PB_CR1,#5     ; 
+  86                                   
+  87  000071   725A03FF                      dec      $03FF
+  88  000075   26BF                          jrne     write_block_cycle
+  89                         
+  90  000077   2095                          jra      main_cycle
+  91                                   
+  92                         ; если первый байт $F0 и более
+  93                         wait_byte_cmd_test:  
+  94  000079   A1F5                          cp       A, #$F5       ; команда 
+                                                                ;перехода к 
+                                                                ;boot_OPTION
+  95  00007B   270B                          jreq     echo_F5cmd
+  96                         wait_tx_err:  
+  97  00007D X 35F10000                      mov      UART1_DR, #$F1          ; неизвестная 
+                                                                ;команда
+  98                         wait_tx_err_F1:  
+  99  000081 X 720F0000FB                    btjf     UART1_SR, #7, wait_tx_err_F1  ; skip if UART1_SR.TXE = 0		TXE:
+                                                                ; Transmit data register empty
+ 100  000086   2086                          jra      main_cycle
+ 101                                   
+ 102                         echo_F5cmd:  
+ 103  000088 X C70000                        ld       UART1_DR, A   ; эхо команды 
+                                                                ;перехода к 
+                                                                ;boot_OPTION
+ 104                         wait_tx_echo_F5cmd:  
+ 105  00008B X 720F0000FB                    btjf     UART1_SR, #7, wait_tx_echo_F5cmd  ; skip if UART1_SR.TXE = 0		TXE:
+                                                                ; Transmit data register empty
+ 106                                   
+ 107                                   
+ 108                         ; GoAdr
+ 109                         wait_byte_adrH_toM 110  000090 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrH_toM
+ 111  000095 X 55000003E6                    mov      $03E6, UART1_DR
+ 112                         wait_byte_adrL_toM 113  00009A X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrL_toM
+ 114  00009F X 55000003E7                    mov      $03E7, UART1_DR
+ 115                         ; SP
+ 116                         wait_byte_adrH_toSP 117  0000A4 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrH_toSP
+ 118  0000A9 X C60000                        ld       A, UART1_DR
+ 119  0000AC   95                            ld       XH, A
+ 120                         wait_byte_adrL_toSP 121  0000AD X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrL_toSP
+ 122  0000B2 X C60000                        ld       A, UART1_DR
+ 123  0000B5   97                            ld       XL, A
+ 124  0000B6   94                            ldw      SP, X
+ 125                         ; Y
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 4  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+ 126                         wait_byte_adrH_toY 127                         ;    btjf   UART1_SR, #5, wait_byte_adrH_toY
+ 128                         ;    ld     A, UART1_DR
+ 129                         ;    ld     YH, A
+ 130                         wait_byte_adrL_toY 131                         ;    btjf   UART1_SR, #5, wait_byte_adrL_toY
+ 132                         ;    ld     A, UART1_DR
+ 133                         ;    ld     YL, A
+ 134                         ; X
+ 135                         wait_byte_adrH_toX 136  0000B7 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrH_toX
+ 137  0000BC X C60000                        ld       A, UART1_DR
+ 138  0000BF   95                            ld       XH, A
+ 139                         wait_byte_adrL_toX 140  0000C0 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_adrL_toX
+ 141  0000C5 X C60000                        ld       A, UART1_DR
+ 142  0000C8   97                            ld       XL, A
+ 143                         ; A
+ 144                         wait_byte_cntr_toA 145  0000C9 X 720B0000FB                    btjf     UART1_SR, #5, wait_byte_cntr_toA
+ 146  0000CE X C60000                        ld       A, UART1_DR
+ 147                         
+ 148  0000D1   72CC03E6                      jp       [$03E6.w]
+ 149                                   
+ 150  0000D5                                 SKIP     28, $00
+ 151                         ; ячейки для адреса перехода
+ 152  0000F1   00                            dc.b     $00
+ 153  0000F2   00                            dc.b     $00
+ 154                                   
+ 155  0000F3                                 end      
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 5  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+Symbol Name                       Value     Call       Type  Scope      Rel.  Line  Privacy  Segment   Size  Bytes File
+
+AWU_CSR                           ????????         no  WORD  External   rel    144  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+AWU_APR                           ????????         no  WORD  External   rel    146  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+AWU_TBR                           ????????         no  WORD  External   rel    148  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB0RH                         ????????         no  WORD  External   rel    362  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB0RL                         ????????         no  WORD  External   rel    364  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB1RH                         ????????         no  WORD  External   rel    366  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB1RL                         ????????         no  WORD  External   rel    368  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB2RH                         ????????         no  WORD  External   rel    370  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB2RL                         ????????         no  WORD  External   rel    372  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB3RH                         ????????         no  WORD  External   rel    374  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB3RL                         ????????         no  WORD  External   rel    376  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB4RH                         ????????         no  WORD  External   rel    378  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB4RL                         ????????         no  WORD  External   rel    380  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB5RH                         ????????         no  WORD  External   rel    382  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB5RL                         ????????         no  WORD  External   rel    384  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB6RH                         ????????         no  WORD  External   rel    386  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB6RL                         ????????         no  WORD  External   rel    388  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB7RH                         ????????         no  WORD  External   rel    390  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB7RL                         ????????         no  WORD  External   rel    392  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB8RH                         ????????         no  WORD  External   rel    394  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB8RL                         ????????         no  WORD  External   rel    396  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB9RH                         ????????         no  WORD  External   rel    398  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DB9RL                         ????????         no  WORD  External   rel    400  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_CSR                           ????????         no  WORD  External   rel    402  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_CR1                           ????????         no  WORD  External   rel    404  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_CR2                           ????????         no  WORD  External   rel    406  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_CR3                           ????????         no  WORD  External   rel    408  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DRH                           ????????         no  WORD  External   rel    410  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_DRL                           ????????         no  WORD  External   rel    412  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_TDRH                          ????????         no  WORD  External   rel    414  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_TDRL                          ????????         no  WORD  External   rel    416  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_HTRH                          ????????         no  WORD  External   rel    418  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_HTRL                          ????????         no  WORD  External   rel    420  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_LTRH                          ????????         no  WORD  External   rel    422  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_LTRL                          ????????         no  WORD  External   rel    424  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_AWSRH                         ????????         no  WORD  External   rel    426  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_AWSRL                         ????????         no  WORD  External   rel    428  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_AWCRH                         ????????         no  WORD  External   rel    430  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ADC_AWCRL                         ????????         no  WORD  External   rel    432  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+BEEP_CSR                          ????????         no  WORD  External   rel    153  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+CLK_ICKR                          ????????         no  WORD  External   rel     99  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_ECKR                          ????????         no  WORD  External   rel    101  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_CMSR                          ????????         no  WORD  External   rel    103  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_SWR                           ????????         no  WORD  External   rel    105  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_SWCR                          ????????         no  WORD  External   rel    107  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_CKDIVR                        ????????         no  WORD  External   rel    109  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_PCKENR1                       ????????         no  WORD  External   rel    111  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_CSSR                          ????????         no  WORD  External   rel    113  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_CCOR                          ????????         no  WORD  External   rel    115  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_PCKENR2                       ????????         no  WORD  External   rel    117  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_CANCCR                        ????????         no  WORD  External   rel    119  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_HSITRIMR                      ????????         no  WORD  External   rel    121  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+CLK_SWIMCCR                       ????????         no  WORD  External   rel    123  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 6  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+CFG_GCR                           ????????         no  WORD  External   rel    437  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+EXTI_CR1                          ????????         no  WORD  External   rel     87  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+EXTI_CR2                          ????????         no  WORD  External   rel     89  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+FLASH_CR1                         ????????         no  WORD  External   rel     68  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_CR2                         ????????         no  WORD  External   rel     70  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_NCR2                        ????????         no  WORD  External   rel     72  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_FPR                         ????????         no  WORD  External   rel     74  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_NFPR                        ????????         no  WORD  External   rel     76  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_IAPSR                       ????????         no  WORD  External   rel     78  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_PUKR                        ????????         no  WORD  External   rel     80  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+FLASH_DUKR                        ????????         no  WORD  External   rel     82  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+IWDG_KR                           ????????         no  WORD  External   rel    135  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+IWDG_PR                           ????????         no  WORD  External   rel    137  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+IWDG_RLR                          ????????         no  WORD  External   rel    139  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_CR1                           ????????         no  WORD  External   rel    177  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_CR2                           ????????         no  WORD  External   rel    179  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_FREQR                         ????????         no  WORD  External   rel    181  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_OARL                          ????????         no  WORD  External   rel    183  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_OARH                          ????????         no  WORD  External   rel    185  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_DR                            ????????         no  WORD  External   rel    187  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_SR1                           ????????         no  WORD  External   rel    189  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_SR2                           ????????         no  WORD  External   rel    191  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_SR3                           ????????         no  WORD  External   rel    193  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_ITR                           ????????         no  WORD  External   rel    195  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_CCRL                          ????????         no  WORD  External   rel    197  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_CCRH                          ????????         no  WORD  External   rel    199  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_TRISER                        ????????         no  WORD  External   rel    201  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+I2C_PECR                          ????????         no  WORD  External   rel    203  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR1                          ????????         no  WORD  External   rel    442  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR2                          ????????         no  WORD  External   rel    444  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR3                          ????????         no  WORD  External   rel    446  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR4                          ????????         no  WORD  External   rel    448  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR5                          ????????         no  WORD  External   rel    450  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR6                          ????????         no  WORD  External   rel    452  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+ITC_SPR7                          ????????         no  WORD  External   rel    454  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+PA_ODR                            ????????         no  WORD  External   rel     16  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PA_IDR                            ????????         no  WORD  External   rel     18  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PA_DDR                            ????????         no  WORD  External   rel     20  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PA_CR1                            ????????         no  WORD  External   rel     22  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PA_CR2                            ????????         no  WORD  External   rel     24  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PB_ODR                            ????????         no  WORD  External   rel     29  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PB_IDR                            ????????         no  WORD  External   rel     31  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PB_DDR                            ????????         no  WORD  External   rel     33  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PB_CR1                            ????????         no  WORD  External   rel     35  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PB_CR2                            ????????         no  WORD  External   rel     37  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PC_ODR                            ????????         no  WORD  External   rel     42  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PC_IDR                            ????????         no  WORD  External   rel     44  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PC_DDR                            ????????         no  WORD  External   rel     46  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PC_CR1                            ????????         no  WORD  External   rel     48  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PC_CR2                            ????????         no  WORD  External   rel     50  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PD_ODR                            ????????         no  WORD  External   rel     55  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PD_IDR                            ????????         no  WORD  External   rel     57  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PD_DDR                            ????????         no  WORD  External   rel     59  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 7  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+PD_CR1                            ????????         no  WORD  External   rel     61  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+PD_CR2                            ????????         no  WORD  External   rel     63  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+RST_SR                            ????????         no  WORD  External   rel     94  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+SPI_CR1                           ????????         no  WORD  External   rel    158  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_CR2                           ????????         no  WORD  External   rel    160  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_ICR                           ????????         no  WORD  External   rel    162  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_SR                            ????????         no  WORD  External   rel    164  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_DR                            ????????         no  WORD  External   rel    166  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_CRCPR                         ????????         no  WORD  External   rel    168  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_RXCRCR                        ????????         no  WORD  External   rel    170  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+SPI_TXCRCR                        ????????         no  WORD  External   rel    172  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+TIM1_CR1                          ????????         no  WORD  External   rel    233  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CR2                          ????????         no  WORD  External   rel    235  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_SMCR                         ????????         no  WORD  External   rel    237  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_ETR                          ????????         no  WORD  External   rel    239  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_IER                          ????????         no  WORD  External   rel    241  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_SR1                          ????????         no  WORD  External   rel    243  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_SR2                          ????????         no  WORD  External   rel    245  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_EGR                          ????????         no  WORD  External   rel    247  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCMR1                        ????????         no  WORD  External   rel    249  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCMR2                        ????????         no  WORD  External   rel    251  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCMR3                        ????????         no  WORD  External   rel    253  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCMR4                        ????????         no  WORD  External   rel    255  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCER1                        ????????         no  WORD  External   rel    257  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCER2                        ????????         no  WORD  External   rel    259  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CNTRH                        ????????         no  WORD  External   rel    261  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CNTRL                        ????????         no  WORD  External   rel    263  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_PSCRH                        ????????         no  WORD  External   rel    265  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_PSCRL                        ????????         no  WORD  External   rel    267  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_ARRH                         ????????         no  WORD  External   rel    269  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_ARRL                         ????????         no  WORD  External   rel    271  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_RCR                          ????????         no  WORD  External   rel    273  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR1H                        ????????         no  WORD  External   rel    275  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR1L                        ????????         no  WORD  External   rel    277  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR2H                        ????????         no  WORD  External   rel    279  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR2L                        ????????         no  WORD  External   rel    281  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR3H                        ????????         no  WORD  External   rel    283  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR3L                        ????????         no  WORD  External   rel    285  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR4H                        ????????         no  WORD  External   rel    287  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_CCR4L                        ????????         no  WORD  External   rel    289  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_BKR                          ????????         no  WORD  External   rel    291  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_DTR                          ????????         no  WORD  External   rel    293  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM1_OISR                         ????????         no  WORD  External   rel    295  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CR1                          ????????         no  WORD  External   rel    300  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_IER                          ????????         no  WORD  External   rel    302  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_SR1                          ????????         no  WORD  External   rel    304  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_SR2                          ????????         no  WORD  External   rel    306  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_EGR                          ????????         no  WORD  External   rel    308  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCMR1                        ????????         no  WORD  External   rel    310  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCMR2                        ????????         no  WORD  External   rel    312  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCMR3                        ????????         no  WORD  External   rel    314  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCER1                        ????????         no  WORD  External   rel    316  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCER2                        ????????         no  WORD  External   rel    318  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CNTRH                        ????????         no  WORD  External   rel    320  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 8  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+TIM2_CNTRL                        ????????         no  WORD  External   rel    322  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_PSCR                         ????????         no  WORD  External   rel    324  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_ARRH                         ????????         no  WORD  External   rel    326  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_ARRL                         ????????         no  WORD  External   rel    328  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR1H                        ????????         no  WORD  External   rel    330  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR1L                        ????????         no  WORD  External   rel    332  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR2H                        ????????         no  WORD  External   rel    334  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR2L                        ????????         no  WORD  External   rel    336  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR3H                        ????????         no  WORD  External   rel    338  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM2_CCR3L                        ????????         no  WORD  External   rel    340  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_CR1                          ????????         no  WORD  External   rel    345  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_IER                          ????????         no  WORD  External   rel    347  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_SR                           ????????         no  WORD  External   rel    349  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_EGR                          ????????         no  WORD  External   rel    351  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_CNTR                         ????????         no  WORD  External   rel    353  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_PSCR                         ????????         no  WORD  External   rel    355  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+TIM4_ARR                          ????????         no  WORD  External   rel    357  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+UART1_SR                          ????????         no  WORD  External   rel    208  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_DR                          ????????         no  WORD  External   rel    210  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_BRR1                        ????????         no  WORD  External   rel    212  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_BRR2                        ????????         no  WORD  External   rel    214  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_CR1                         ????????         no  WORD  External   rel    216  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_CR2                         ????????         no  WORD  External   rel    218  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_CR3                         ????????         no  WORD  External   rel    220  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_CR4                         ????????         no  WORD  External   rel    222  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_CR5                         ????????         no  WORD  External   rel    224  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_GTR                         ????????         no  WORD  External   rel    226  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+UART1_PSCR                        ????????         no  WORD  External   rel    228  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+WWDG_CR                           ????????         no  WORD  External   rel    128  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+WWDG_WR                           ????????         no  WORD  External   rel    130  private  textdata     0     0  d:\stm\_toolchain\stm8_asm\include\STM8S103F.inc
+
+echo_F5cmd                            0088         no  WORD  Internal   ABS    102  private  textdata     3     0  -
+
+main_cycle                            000E         no  WORD  Internal   ABS     30  private  textdata    16     0  -
+
+start                                 0002         no  WORD  Internal   ABS     17  private  textdata    12     0  -
+
+tx_echo_adrH                          001E         no  WORD  Internal   ABS     39  private  textdata     5     0  -
+
+wait_byte_adrH_cmnd                   000E         no  WORD  Internal   ABS     32  private  textdata    16     0  -
+wait_byte_adrL                        0023         no  WORD  Internal   ABS     42  private  textdata     9     0  -
+wait_byte_cntr                        002C         no  WORD  Internal   ABS     48  private  textdata    10     0  -
+write_block_cycle                     0036         no  WORD  Internal   ABS     53  private  textdata    28     0  -
+wait_rx_byte                          0052         no  WORD  Internal   ABS     72  private  textdata    18     0  -
+wait_tx_OK_FA                         0064         no  WORD  Internal   ABS     81  private  textdata    21     0  -
+wait_byte_cmd_test                    0079         no  WORD  Internal   ABS     93  private  textdata     4     0  -
+wait_tx_err                           007D         no  WORD  Internal   ABS     96  private  textdata     4     0  -
+wait_tx_err_F1                        0081         no  WORD  Internal   ABS     98  private  textdata     7     0  -
+wait_tx_echo_F5cmd                    008B         no  WORD  Internal   ABS    104  private  textdata     5     0  -
+wait_byte_adrH_toM                    0090         no  WORD  Internal   ABS    109  private  textdata    10     0  -
+wait_byte_adrL_toM                    009A         no  WORD  Internal   ABS    112  private  textdata    10     0  -
+wait_byte_adrH_toSP                   00A4         no  WORD  Internal   ABS    116  private  textdata     9     0  -
+wait_byte_adrL_toSP                   00AD         no  WORD  Internal   ABS    120  private  textdata    10     0  -
+wait_byte_adrH_toY                    00B7         no  WORD  Internal   ABS    126  private  textdata     9     0  -
+wait_byte_adrL_toY                    00B7         no  WORD  Internal   ABS    130  private  textdata     9     0  -
+STMicroelectronics assembler v4.52   (C)1987-2018   Sun Jul 29 11:43:05 2018
+Page 9  Assembler
+                                               d:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm
+
+wait_byte_adrH_toX                    00B7         no  WORD  Internal   ABS    135  private  textdata     9     0  -
+wait_byte_adrL_toX                    00C0         no  WORD  Internal   ABS    139  private  textdata     9     0  -
+wait_byte_cntr_toA                    00C9         no  WORD  Internal   ABS    144  private  textdata    42     0  -
+
+
+213 labels
+No errors on assembly of 'd:\sourceforge.net\projects\ovsp\files\boot_uc_rev0d_dumps\writeblocks_flash_128000v0d.asm'
