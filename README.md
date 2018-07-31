@@ -6,7 +6,7 @@ The bootloader code is located in FLASH memory, EEPROM memory and/or in the memo
 
 STM8uLoader takes the size:
 
-- for rev.0D only 8 bytes in FLASH memory (adr.$8000...$8007) and 35 bytes in EEPROM memory;
+- for rev.0D only 8 bytes in FLASH memory (adr.$8000...$8007) and 36 bytes in EEPROM memory;
 
 - for rev.14 only 20 bytes in FLASH memory (adr.$8000...$8003, $9FF0...$9FFF) and up to 52 bytes in EEPROM memory or in the OPTION Bytes memory area;
 
