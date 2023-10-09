@@ -59,7 +59,7 @@ See also:
 
  [https://sourceforge.net/projects/ovsp](https://sourceforge.net/projects/ovsp)
 
- [STM8uLoader - компактный STM8 UART загрузчик](http://nflic.ru/STM8/STM8uLoader/index.html)
+ [STM8uLoader - компактный STM8 UART загрузчик](http://nlic.ru/STM8/STM8uLoader/index.html)
 
 ---
-Any questions please in the nflic@bk.ru
+Any questions please in the nlic@bk.ru
